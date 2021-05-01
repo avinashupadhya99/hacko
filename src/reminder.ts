@@ -15,7 +15,7 @@ export const setReminder = (reminder: IReminder) => {
             deadline5Timer = setTimeout(() => {
                 const reminderChannel = reminder.client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
                 (<TextChannel> reminderChannel).send(`Deadline aproaching in 5 minutes!`);
-            });
+            }, reminder.time);
         break;
     }
 }
