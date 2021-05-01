@@ -16,7 +16,23 @@ const timeZoneRegex = /^(?:Z|[+-]([01]?[0-9]):[0-5][0-9])$/;
 
 client.on('ready', () => {
     console.log('Bot started');
-    database.getEvents();
+    database.getDeadline().then(deadlineMilliSeconds => {
+        if(deadlineMilliSeconds > new Date().getTime()) {
+            setReminder({
+                type: 'DEADLINE5',
+                time: (deadlineMilliSeconds - new Date().getTime() - 300000),
+                client: client
+            });
+            setReminder({
+                type: 'DEADLINE15',
+                time: (deadlineMilliSeconds - new Date().getTime() - 900000),
+                client: client
+            });
+        }
+    }).catch(err => {
+        console.error(err);
+    })
+
 });
 
 client.on('message', message => {
@@ -39,6 +55,11 @@ client.on('message', message => {
                             setReminder({
                                 type: 'DEADLINE5',
                                 time: (deadlineMilliSeconds - new Date().getTime() - 300000),
+                                client: client
+                            });
+                            setReminder({
+                                type: 'DEADLINE15',
+                                time: (deadlineMilliSeconds - new Date().getTime() - 900000),
                                 client: client
                             });
                             return message.reply(`Deadline set for ${timeRemaining} hours from now`);

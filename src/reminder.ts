@@ -10,11 +10,20 @@ export const setReminder = (reminder: IReminder) => {
         console.error("Reminders channel not found. Make sure to setup REMINDER_CHANNEL_ID env variable.")
         return;
     }
+    if(reminder.time < 0) {
+        console.error(`Reminder time elapsed for ${reminder.type} with time ${reminder.time}`);
+    }
     switch(reminder.type) {
         case 'DEADLINE5':
             deadline5Timer = setTimeout(() => {
                 const reminderChannel = reminder.client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
                 (<TextChannel> reminderChannel).send(`Deadline aproaching in 5 minutes!`);
+            }, reminder.time);
+        break;
+        case 'DEADLINE15':
+            deadline5Timer = setTimeout(() => {
+                const reminderChannel = reminder.client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
+                (<TextChannel> reminderChannel).send(`Deadline aproaching in 15 minutes!`);
             }, reminder.time);
         break;
     }
