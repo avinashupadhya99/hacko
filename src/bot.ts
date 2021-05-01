@@ -5,8 +5,10 @@ import * as database from './database';
 import * as deadline from './deadline';
 
 import { Client } from 'discord.js';
+import { setReminder } from './reminder';
 const client = new Client();
 const PREFIX: string = '?';
+
 
 const dateRegex = /^((0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](19|20)?[0-9]{2})*$/;
 const timeRegex = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -34,6 +36,11 @@ client.on('message', message => {
                     const timeRemaining: number = deadline.getTimeRemaining(deadlineMilliSeconds);
                     if(timeRemaining >= 0) {
                         database.setDeadline(deadlineMilliSeconds).then(() => {
+                            setReminder({
+                                type: 'DEADLINE5',
+                                time: (deadlineMilliSeconds - new Date().getTime() - 300000),
+                                client: client
+                            });
                             return message.reply(`Deadline set for ${timeRemaining} hours from now`);
                         }).catch(err => {
                             return message.reply("Something went wrong while setting deadline");
