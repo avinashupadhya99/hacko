@@ -58,7 +58,9 @@ client.on('message', message => {
                     if(isNaN(timeRemaining)) {
                         return message.reply("Something went wrong while fetching deadline. We are sorry. Try setting the deadline again");
                     }
-                    return message.reply(`Deadline is at ${timeRemaining} hours from now`);
+                    if(timeRemaining >= 0)
+                        return message.reply(`Deadline is at ${timeRemaining} hours from now`);
+                    return message.reply(`Already passed deadline`);
                 }).catch(err => {
                     if(err.code && err.code === 'NOT_FOUND') {
                         return message.reply('Deadline not set. Use `?set_deadline MM-DD-YYYY HH:mm GMT +/- xx:yy` to set the deadline');
