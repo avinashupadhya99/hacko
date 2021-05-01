@@ -17,3 +17,18 @@ export const setDeadline = (deadline: number): Promise<void> => {
         }
     });    
 }
+
+export const getDeadline = (): Promise<number> => {
+    return new Promise<number>(async (resolve, reject) => {
+        try {
+            const res = await db.collection('data').doc('deadline').get();
+            if (!res.exists) {
+                reject({code: 'NOT_FOUND', error: 'Deadline not set'});
+            }
+            const deadline: number = Number(res.data()?.['deadline']);
+            resolve(deadline);
+        } catch(exception) {
+            reject({code: 'UNKNOWN', error: exception});
+        }
+    });    
+}

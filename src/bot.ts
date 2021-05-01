@@ -45,6 +45,22 @@ client.on('message', message => {
                     return message.reply("Please provide the time in the format MM-DD-YYYY HH:mm GMT +/- xx:yy");
                 }
                 break;
+            case 'time_left':
+                database.getDeadline().then(deadlineMilliSeconds => {
+                    const timeRemaining: number = deadline.getTimeRemaining(deadlineMilliSeconds);
+                    if(isNaN(timeRemaining)) {
+                        return message.reply("Something went wrong while fetching deadline. We are sorry. Try setting the deadline again");
+                    }
+                    return message.reply(`Deadline is at ${timeRemaining} hours from now`);
+                }).catch(err => {
+                    if(err.code && err.code === 'NOT_FOUND') {
+                        return message.reply('Deadline not set. Use `?set_deadline MM-DD-YYYY HH:mm GMT +/- xx:yy` to set the deadline');
+                    } else {
+                        return message.reply("Something went wrong while fetching deadline. We are sorry");
+                    }
+                })
+
+            break;
             default:
                 return message.reply('Command not found. Use `?help` for help with commands')
         }
