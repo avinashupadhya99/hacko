@@ -1,4 +1,5 @@
 import { db } from './firebase';
+import { IEvent } from "./interfaces/IEvent";
 
 export const getEvents = async() => {
     const querySnapshot = await db.collection('events').get();
@@ -57,4 +58,19 @@ export const setTimezone = (userID: string, timezone: string): Promise<void> => 
             reject(exception);
         }
     });    
+}
+
+export const setEvent = (event: Event): Promise<void> => {
+    return new Promise<void>(async (resolve, reject) => {
+        try {
+            await db.collection('events').doc(event.name).set({
+                name: event.name,
+                time: event.time,
+                link: event.link
+            })
+            resolve();
+        } catch(exception) {
+            reject(exception);
+        }
+    })
 }
