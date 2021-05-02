@@ -1,5 +1,6 @@
 import { db } from './firebase';
 import { IEvent } from "./interfaces/IEvent";
+import { IEvents } from "./interfaces/IEventArray";
 
 export const getEvents = async() => {
     const querySnapshot = await db.collection('events').get();
@@ -73,4 +74,22 @@ export const setEvent = (event: Event): Promise<void> => {
             reject(exception);
         }
     })
+}
+
+export const getEvents = (): Promise<Events> => {
+    return new Promise<Events>(async (resolve, reject) => {
+        try {
+            const res = await db.collection('events').get();
+            if (res.empty) {
+                reject({code: 'EMPTY', error: 'No events configured'});
+            }
+            let events = [];
+            res.forEach(doc => {
+                events.push(doc.data());
+            });
+            resolve(events);
+        } catch(exception) {
+            reject({code: 'UNKNOWN', error: exception});
+        }
+    });    
 }

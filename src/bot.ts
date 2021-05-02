@@ -5,6 +5,7 @@ import config from './config';
 import * as database from './database';
 import * as deadline from './deadline';
 import { IEvent } from "./interfaces/IEvent";
+import { IEvents } from "./interfaces/IEventArray";
 import { setReminder } from './reminder';
 const { TIMEZONES } = config;
 
@@ -209,6 +210,34 @@ client.on('message', message => {
                     } else {
                         return message.reply('Use `?timezone help` for help with the command');
                     }
+                break;
+
+                case 'events':
+                    database.getEvents().then((events: IEvents) => {
+                        // TODO: Handle message length
+                        let description = '';
+                        events.forEach(event => {
+                            description += `**Event name**: ${event.name}\n**Event time**: ${new Date(event.time).toUTCString()}\n**Event link**: ${event.link ? event.link : 'None'}\n\n`
+                        })
+                        const embed =new MessageEmbed()
+                            .setTitle('Events')
+                            .setDescription(description)
+                            .setColor('#FFA500')
+                            .setTimestamp();
+                        return message.channel.send(embed);
+                    }).catch(err => {
+                        if(err.code && err.code === 'EMPTY') {
+                            const embed =new MessageEmbed()
+                                .setTitle('No Events')
+                                .setDescription(`No events configured`)
+                                .setColor('#FFA500')
+                                .setTimestamp();
+                            return message.channel.send(embed);
+                        } else {
+                            console.error(err);
+                            return message.reply("Something went wrong while fetching events. We are sorry");
+                        }
+                    })
                 break;
 
                 default:
