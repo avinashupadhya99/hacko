@@ -1,10 +1,12 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+import config from './config';
 import * as database from './database';
 import * as deadline from './deadline';
+const { TIMEZONES } = config;
 
-import { Client } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { setReminder } from './reminder';
 const client = new Client();
 const PREFIX: string = '?';
@@ -90,6 +92,75 @@ client.on('message', message => {
                     }
                 })
 
+            break;
+            case 'timezone':
+                if(args.length === 0) {
+                    const embed =new MessageEmbed()
+                        .setTitle('All timezones')
+                        .setDescription("You can find the list of timezones at http://worldtimeapi.org/timezones.\n Use `?timezone help` for help with the command")
+                        .setColor('#0099ff')
+                        .setTimestamp();
+                    message.channel.send(embed);
+                } else if(args.length === 1) {
+                    let mention = args[0];
+                    if (mention.startsWith('<@') && mention.endsWith('>')) {
+                        mention = mention.slice(2, -1);
+                        if (mention.startsWith('!')) {
+                            mention = mention.slice(1);
+                        }
+                        const mentionedUser: User = client.users.cache.get(mention);
+                        database.getTimezone(mention).then(timezone => {
+                            const embed =new MessageEmbed()
+                                .setTitle('Timezone')
+                                .setDescription(`Timezone for @${mentionedUser.username} is ${timezone}`)
+                                .setColor('#0099ff')
+                                .setTimestamp();
+                            message.channel.send(embed);
+                        }).catch(err => {
+                            if(err.code && err.code === 'NOT_FOUND') {
+                                const embed =new MessageEmbed()
+                                    .setTitle('Timezone Not Set')
+                                    .setDescription(`Timezone for @${mentionedUser.username} is not set.\nUse \`?timezone @${mentionedUser.username} <timezone>\` to set the timezone for the user`)
+                                    .setColor('#0099ff')
+                                    .setTimestamp();
+                                return message.channel.send(embed);
+                            } else {
+                                return message.reply("Something went wrong while fetching deadline. We are sorry");
+                            }
+                        })
+                    } else {
+                        return message.reply('Mention an user whose timezone you want to know');
+                    }
+                } else if(args.length === 2) {
+                    let mention = args[0];
+                    if (mention.startsWith('<@') && mention.endsWith('>')) {
+                        const timezone = args[1];
+                        if(!TIMEZONES.includes(timezone)) {
+                            return message.reply('Timezone not recognised\nUse `?timezone` to check the list of timezones OR use `?timezone help` for help with the command');
+                        }
+                        mention = mention.slice(2, -1);
+                        if (mention.startsWith('!')) {
+                            mention = mention.slice(1);
+                        }
+                        const mentionedUser: User = client.users.cache.get(mention);
+                        database.setTimezone(mention, timezone).then(() => {
+                            const embed =new MessageEmbed()
+                                    .setTitle('Timezone Not Set')
+                                    .setDescription(`Timezone for @${mentionedUser.username} is set to ${timezone}`)
+                                    .setColor('#0099ff')
+                                    .setTimestamp();
+                            return message.channel.send(embed);
+                        }).catch(err => {
+                            console.error(err);
+                            return message.reply("Something went wrong while setting timezone");
+                        });
+
+                    } else {
+                        return message.reply('Mention an user whose timezone you want to know');
+                    }
+                } else {
+                    return message.reply('Use `?timezone help` for help with the command');
+                }
             break;
             default:
                 return message.reply('Command not found. Use `?help` for help with commands')

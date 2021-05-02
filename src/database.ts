@@ -32,3 +32,29 @@ export const getDeadline = (): Promise<number> => {
         }
     });    
 }
+
+export const getTimezone = (userID: string): Promise<string> => {
+    return new Promise<string>(async (resolve, reject) => {
+        try {
+            const res = await db.collection('timezones').doc(userID).get();
+            if (!res.exists) {
+                reject({code: 'NOT_FOUND', error: 'Timezone not set'});
+            }
+            const timezone: string = res.data()['timezone'];
+            resolve(timezone);
+        } catch(exception) {
+            reject({code: 'UNKNOWN', error: exception});
+        }
+    })
+}
+
+export const setTimezone = (userID: string, timezone: string): Promise<void> => {
+    return new Promise<void>(async (resolve, reject) => {
+        try {
+            await db.collection('timezones').doc(userID).set({timezone});
+            resolve();
+        } catch(exception) {
+            reject(exception);
+        }
+    });    
+}
