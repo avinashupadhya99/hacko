@@ -265,6 +265,24 @@ client.on('message', message => {
                     })
                 break;
 
+                case 'clear':
+                    if(args.length != 1) {
+                        return message.reply('Clear command expects 1 argument. It can be either `events` or `deadline`')
+                    }
+                    switch(args[0]) {
+                        case 'events':
+
+                        break;
+
+                        case 'deadline':
+
+                        break;
+                        default:
+                            return message.reply(`Cannot clear \`${args[0]}\`. It can be either \`events\` or \`deadline\``)
+                        break;
+                    }
+                break;
+
                 default:
                     return message.reply('Command not found. Use `?help` for help with commands')
             }
