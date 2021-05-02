@@ -114,3 +114,34 @@ export const getGitNotifications = async (): boolean => {
     const res = await db.collection('data').doc('git').get();
     return res.exists && res.data()['notifications'];
 }
+
+export const storeResource = async(resource: string): Promise<void> => {
+    return new Promise<void>(async (resolve, reject) => {
+        try {
+            await db.collection('resources').add({
+                resource
+            })
+            resolve();
+        } catch(exception) {
+            reject(exception);
+        }
+    });
+}
+
+export const getResources = (): Promise<string[]> => {
+    return new Promise<string[]>(async (resolve, reject) => {
+        try {
+            const res = await db.collection('resources').get();
+            if (res.empty) {
+                reject({code: 'EMPTY', error: 'No resources configured'});
+            }
+            let resources: string[] = [];
+            res.forEach(doc => {
+                resources.push(doc.data()['resource']);
+            });
+            resolve(resources);
+        } catch(exception) {
+            reject({code: 'UNKNOWN', error: exception});
+        }
+    });    
+}

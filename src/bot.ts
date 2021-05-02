@@ -332,6 +332,45 @@ client.on('message', message => {
                     })
                 break;
 
+                case 'resources':
+                    if(args.length > 0) {
+                        const resource = args.join(' ');
+                        database.storeResource(resource).then(() => {
+                            const embed =new MessageEmbed()
+                                .setTitle('Resource stored')
+                                .setDescription(`${resource} stored successfully`)
+                                .setColor('#FFC0CB')
+                                .setTimestamp();
+                            return message.channel.send(embed);
+                        }).catch(err => {
+                            console.error(err);
+                            return message.reply("Something went wrong while storing the resource");
+                        });
+                    } else {
+                        database.getResources().then((resources: string[]) => {
+                            // TODO: Handle message length
+                            const embed =new MessageEmbed()
+                                .setTitle('Resources')
+                                .setDescription(resources)
+                                .setColor('#FFC0CB')
+                                .setTimestamp();
+                            return message.channel.send(embed);
+                        }).catch(err => {
+                            if(err.code && err.code === 'EMPTY') {
+                                const embed =new MessageEmbed()
+                                    .setTitle('No Resources')
+                                    .setDescription(`No resources added.\nUse \`?resources <resource>\` to add new resources`)
+                                    .setColor('#FFC0CB')
+                                    .setTimestamp();
+                                return message.channel.send(embed);
+                            } else {
+                                console.error(err);
+                                return message.reply("Something went wrong while fetching resources. We are sorry");
+                            }
+                        })
+                    }
+                break;
+
                 default:
                     return message.reply('Command not found. Use `?help` for help with commands')
             }
