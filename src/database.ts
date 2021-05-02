@@ -98,3 +98,19 @@ export const getEvents = (options): Promise<Events> => {
         }
     });    
 }
+
+export const setGitNotifications = (value: boolean): Promise<void> => {
+    return new Promise<void>(async (resolve, reject) => {
+        try {
+            await db.collection('data').doc('git').set({notifications: value});
+            resolve();
+        } catch(exception) {
+            reject(exception);
+        }
+    });
+}
+
+export const getGitNotifications = async (): boolean => {
+    const res = await db.collection('data').doc('git').get();
+    return res.exists && res.data()['notifications'];
+}

@@ -6,13 +6,12 @@ import * as database from './database';
 import * as deadline from './deadline';
 import { IEvent } from "./interfaces/IEvent";
 import { IEvents } from "./interfaces/IEventArray";
-import { setReminder } from './reminder';
+import { setReminder, startGitNotifications, stopGitNotifications } from './reminder';
 const { TIMEZONES } = config;
 
 import { Client, MessageEmbed } from 'discord.js';
 const client = new Client();
 const PREFIX: string = '?';
-
 
 const dateRegex = /^((0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](19|20)?[0-9]{2})*$/;
 const timeRegex = /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -51,6 +50,11 @@ client.on('ready', () => {
     }).catch(err => {
         console.error(err);
     });
+    database.getGitNotifications().then(value => {
+        if(value) {
+            startGitNotifications();
+        }
+    })
 
 });
 
@@ -279,6 +283,30 @@ client.on('message', message => {
                         break;
                         default:
                             return message.reply(`Cannot clear \`${args[0]}\`. It can be either \`events\` or \`deadline\``)
+                        break;
+                    }
+                break;
+
+                case 'git':
+                    if(args.length != 1) {
+                        return message.reply('git command expects 1 argument. It can be either `on` or `off`')
+                    }
+                    switch(args[0]) {
+                        case 'on':
+                            database.setGitNotifications(true).then(() => {
+                                startGitNotifications(client);
+                                return message.reply("Git notifications turned on. You will be notified every 2 hours to commit");
+                            });
+                        break;
+
+                        case 'off':
+                            database.setGitNotifications(false).then(() => {
+                                stopGitNotifications();
+                                return message.reply("Git notifications turned off");
+                            });
+                        break;
+                        default:
+                            return message.reply(`Cannot set git notifications \`${args[0]}\`. It can be either \`on\` or \`off\``)
                         break;
                     }
                 break;

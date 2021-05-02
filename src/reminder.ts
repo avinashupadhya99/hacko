@@ -1,4 +1,4 @@
-import { TextChannel, MessageEmbed } from 'discord.js';
+import { Client, TextChannel, MessageEmbed } from 'discord.js';
 import config from './config';
 import { IReminder } from "./interfaces/IReminder";
 const { REMINDER_CHANNEL_ID } = config;
@@ -6,6 +6,8 @@ const { REMINDER_CHANNEL_ID } = config;
 let deadline5Timer: ReturnType<typeof setTimeout>;
 let deadline15Timer: ReturnType<typeof setTimeout>;
 let event5Timer: ReturnType<typeof setTimeout>;
+
+let gitNotifications: ReturnType<typeof setInterval>;
 
 export const setReminder = (reminder: IReminder) => {
     if(!REMINDER_CHANNEL_ID) {
@@ -58,4 +60,21 @@ export const clearReminder = (reminderType: string) => {
             clearTimeout(deadline5Timer);
         break;
     }
+}
+
+export const startGitNotifications = (client: Client) => {
+    gitNotifications = setInterval(() => {
+        const embed =new MessageEmbed()
+                    .setTitle('Git reminder')
+                    .setDescription(`This is your friendly git reminder. Please remember to commit as soon as you have a tiny working feature`)
+                    .setColor('#FFFF00')
+                    .setFooter('You can turn this off using `?git off`')
+                    .setTimestamp();
+        const reminderChannel = client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
+        (<TextChannel> reminderChannel).send(embed);
+    }, 2 * 60 * 60 * 10000); // 2 hours
+}
+
+export const stopGitNotifications = () => {
+    clearInterval(gitNotifications);
 }
