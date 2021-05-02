@@ -6,10 +6,12 @@ import * as database from './database';
 import * as deadline from './deadline';
 import { IEvent } from "./interfaces/IEvent";
 import { IEvents } from "./interfaces/IEventArray";
+import { IMotivationalQuote } from "./interfaces/IMotivationalQuote";
 import { setReminder, startGitNotifications, stopGitNotifications } from './reminder';
 const { TIMEZONES } = config;
 
 import { Client, MessageEmbed } from 'discord.js';
+import fetch from 'node-fetch';
 const client = new Client();
 const PREFIX: string = '?';
 
@@ -314,6 +316,22 @@ client.on('message', message => {
                     }
                 break;
 
+                case 'motivate':
+                    api<IMotivationalQuote>('https://api.quotable.io/random?tags=technology%7Cinspirational%7Csuccess%7Cscience')
+                    .then((data: IMotivationalQuote) => {
+                        const embed =new MessageEmbed()
+                            .setTitle('Your motivational quote!')
+                            .setDescription(`${data.content}\n~${data.author}`)
+                            .setColor('#008000')
+                            .setTimestamp();
+                        message.channel.send(embed);
+                    })
+                    .catch(apiError => {
+                        console.error(apiError);
+                        message.reply('Sorry something went wrong and we cannot provide a quote right now, but you got this! :thumbsup:')
+                    })
+                break;
+
                 default:
                     return message.reply('Command not found. Use `?help` for help with commands')
             }
@@ -333,5 +351,17 @@ client.on('message', message => {
         })
     }
 });
+
+// Function to call APIs
+function api<T>(url: string): Promise<T> {
+    return fetch(url)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+        return response.json<T>()
+    })
+
+}
 
 client.login(process.env.DISCORD_BOT_TOKEN);
