@@ -179,8 +179,7 @@ client.on('message', message => {
                             const mentionedUser: User = client.users.cache.get(mention);
                             database.getTimezone(mention).then(timezone => {
                                 const currentDate: Date = new Date();
-                                let currentTime = currentDate.toLocaleString('en-US', { timeZone: timezone });
-                                currentTime = currentTime.split(',')[1].trim();
+                                const currentTime = currentDate.toLocaleTimeString('en-US', { timeZone: timezone });
                                 const embed =new MessageEmbed()
                                     .setTitle('Timezone')
                                     .setDescription(`Timezone for @${mentionedUser.username} is ${timezone}\nThe current time is \`${currentTime}\``)
@@ -319,6 +318,19 @@ client.on('message', message => {
                     return message.reply('Command not found. Use `?help` for help with commands')
             }
         }
+    } else {
+        message.mentions.users.forEach(user => {
+            if(!user.bot) {
+                database.getTimezone(user.id).then(timezone => {
+                    const currentDate: Date = new Date();
+                    const currentTime = currentDate.toLocaleTimeString('it-IT', { timeZone: timezone });
+                    const hour = Number(currentTime.split(":")[0]);
+                    if(hour>=23 || hour<=7) {
+                        message.channel.send(`\`It's ${currentDate.toLocaleTimeString('en-US', { timeZone: timezone })} for ${user.username}. Hacker might be sleeping \`:stuck_out_tongue_winking_eye:`);
+                    }
+                });
+            }
+        })
     }
 });
 
