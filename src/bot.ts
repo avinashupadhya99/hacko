@@ -178,9 +178,12 @@ client.on('message', message => {
                             }
                             const mentionedUser: User = client.users.cache.get(mention);
                             database.getTimezone(mention).then(timezone => {
+                                const currentDate: Date = new Date();
+                                let currentTime = currentDate.toLocaleString('en-US', { timeZone: timezone });
+                                currentTime = currentTime.split(',')[1].trim();
                                 const embed =new MessageEmbed()
                                     .setTitle('Timezone')
-                                    .setDescription(`Timezone for @${mentionedUser.username} is ${timezone}`)
+                                    .setDescription(`Timezone for @${mentionedUser.username} is ${timezone}\nThe current time is \`${currentTime}\``)
                                     .setColor('#0099ff')
                                     .setTimestamp();
                                 message.channel.send(embed);
@@ -211,6 +214,7 @@ client.on('message', message => {
                                 mention = mention.slice(1);
                             }
                             const mentionedUser: User = client.users.cache.get(mention);
+
                             database.setTimezone(mention, timezone).then(() => {
                                 const embed =new MessageEmbed()
                                         .setTitle('Timezone Not Set')
