@@ -398,6 +398,26 @@ client.on('message', message => {
                     }
                 break;
 
+                case 'help':
+                    const embed =new MessageEmbed()
+                        .setTitle('Help menu')
+                        .setDescription(`List of commands available`)
+                        .addFields(
+                            {name: 'set_deadline', value: 'Set a deadline for project submission and be notified at appropriate times'},
+                            {name: 'set_event', value: 'Set reminders for events happenning at the hackathon'},
+                            {name: 'timezone', value: 'Set timezone for hackers and view timezones'},
+                            {name: 'time_left', value: 'Get the time left for the deadline'},
+                            {name: 'events', value: 'Get all events added'},
+                            {name: 'git', value: 'Turn on/off notifications for committing code to git'},
+                            {name: 'motivate', value: 'Get a motivational quote to stay motivated'},
+                            {name: 'resources', value: 'Store resources and access them any time'},
+                            {name: 'clear', value: 'Clear deadlines and events'},
+                        )
+                        .setColor('#ff0000')
+                        .setTimestamp();
+                    message.channel.send(embed);
+                break;
+
                 default:
                     return message.reply('Command not found. Use `?help` for help with commands')
             }
