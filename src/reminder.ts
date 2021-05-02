@@ -1,9 +1,11 @@
-import { TextChannel } from 'discord.js';
+import { TextChannel, MessageEmbed } from 'discord.js';
 import config from './config';
 import { IReminder } from "./interfaces/IReminder";
 const { REMINDER_CHANNEL_ID } = config;
 
 let deadline5Timer: ReturnType<typeof setTimeout>;
+let deadline15Timer: ReturnType<typeof setTimeout>;
+let event5Timer: ReturnType<typeof setTimeout>;
 
 export const setReminder = (reminder: IReminder) => {
     if(!REMINDER_CHANNEL_ID) {
@@ -16,14 +18,35 @@ export const setReminder = (reminder: IReminder) => {
     switch(reminder.type) {
         case 'DEADLINE5':
             deadline5Timer = setTimeout(() => {
+                const embed =new MessageEmbed()
+                    .setTitle('Deadline reminder')
+                    .setDescription(`Deadline aproaching in 5 minutes!`)
+                    .setColor('#FFFF00')
+                    .setTimestamp();
                 const reminderChannel = reminder.client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
-                (<TextChannel> reminderChannel).send(`Deadline aproaching in 5 minutes!`);
+                (<TextChannel> reminderChannel).send(embed);
             }, reminder.time);
         break;
         case 'DEADLINE15':
-            deadline5Timer = setTimeout(() => {
+            deadline15Timer = setTimeout(() => {
+                const embed =new MessageEmbed()
+                    .setTitle('Deadline reminder')
+                    .setDescription(`Deadline aproaching in 15 minutes!`)
+                    .setColor('#FFFF00')
+                    .setTimestamp();
                 const reminderChannel = reminder.client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
-                (<TextChannel> reminderChannel).send(`Deadline aproaching in 15 minutes!`);
+                (<TextChannel> reminderChannel).send(embed);
+            }, reminder.time);
+        break;
+        case 'EVENT5':
+            deadline5Timer = setTimeout(() => {
+                const embed =new MessageEmbed()
+                    .setTitle('Event reminder')
+                    .setDescription(`Event in 5 minutes!\n**Event name**: ${reminder.additionalInfo.name}\n**Event link**: ${reminder.additionalInfo.link ? reminder.additionalInfo.link : 'None'}`)
+                    .setColor('#FFFF00')
+                    .setTimestamp();
+                const reminderChannel = reminder.client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
+                (<TextChannel> reminderChannel).send(embed);
             }, reminder.time);
         break;
     }

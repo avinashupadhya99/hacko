@@ -34,7 +34,7 @@ client.on('ready', () => {
         }
     }).catch(err => {
         console.error(err);
-    })
+    });
 
 });
 
@@ -61,6 +61,15 @@ client.on('message', message => {
                         time: eventMilliSeconds,
                         link: args[2] ? args[2] : ''
                     }).then(() => {
+                        setReminder({
+                            type: 'EVENT5',
+                            time: (eventMilliSeconds - new Date().getTime() - 300000),
+                            client: client,
+                            additionalInfo: {
+                                name: args[0],
+                                link: args[2]
+                            }
+                        });
                         const embed =new MessageEmbed()
                                 .setTitle('Event information recorded')
                                 .setDescription(`**Event name**: ${args[0]}\n**Event time**: ${args[1]}\n**Event link**: ${args[2] ? args[2] : 'None'}`)
@@ -69,7 +78,7 @@ client.on('message', message => {
                         return message.channel.send(embed);
                     }).catch(err => {
                         console.error(err);
-                        return message.reply("Something went wrong while setting timezone");
+                        return message.reply("Something went wrong while setting event");
                     });
         } else {
                     return message.reply("Please provide the event time in the format MM-DD-YYYY HH:mm GMT +/- xx:yy");
