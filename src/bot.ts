@@ -36,6 +36,21 @@ client.on('ready', () => {
     }).catch(err => {
         console.error(err);
     });
+    database.getEvents().then((events: IEvents) => {
+        events.forEach((event: Event) => {
+            setReminder({
+                type: 'EVENT5',
+                time: (event.time - new Date().getTime() - 300000),
+                client: client,
+                additionalInfo: {
+                    name: event.name,
+                    link: event.link
+                }
+            });
+        });
+    }).catch(err => {
+        console.error(err);
+    });
 
 });
 
