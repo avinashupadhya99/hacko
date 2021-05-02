@@ -1,4 +1,4 @@
-# hacko
+# Hacko
 
 Discord bot for digital hackathons. Built as a part of [Hack at Home II](https://organize.mlh.io/participants/events/6794-hack-at-home-ii)
 
