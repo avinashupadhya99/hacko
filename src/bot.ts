@@ -200,6 +200,33 @@ client.on('message', message => {
                                     return message.reply("Something went wrong while fetching deadline. We are sorry");
                                 }
                             })
+                        } else if(args[0] === 'all') {
+                            database.getAllTimezones().then((timezones: {userID: string, timezone: string}[]) => {
+                                // TODO: Handle message length
+                                const embed =new MessageEmbed()
+                                    .setTitle('Timezones of all hackers')
+                                    .setColor('#0099ff')
+                                    .setTimestamp();
+                                timezones.forEach((timezone: {userID: string, timezone: string}) => {
+                                    const user: User = client.users.cache.get(timezone.userID);
+                                    const currentTime: string = new Date().toLocaleTimeString('en-US', { timeZone: timezone.timezone });
+                                    embed.addField(`@${user.username}`, `${timezone.timezone}  ${currentTime}`);
+                                });
+                                return message.channel.send(embed);
+                            }).catch(err => {
+                                if(err.code && err.code === 'EMPTY') {
+                                    const embed =new MessageEmbed()
+                                        .setTitle('No Timezones')
+                                        .setDescription(`No timezones configured`)
+                                        .setColor('#FFA500')
+                                        .setTimestamp();
+                                    return message.channel.send(embed);
+                                } else {
+                                    console.error(err);
+                                    return message.reply("Something went wrong while fetching timezones. We are sorry");
+                                }
+                            })
+
                         } else {
                             return message.reply('Mention an user whose timezone you want to know');
                         }

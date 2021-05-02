@@ -61,6 +61,24 @@ export const setTimezone = (userID: string, timezone: string): Promise<void> => 
     });    
 }
 
+export const getAllTimezones = (): Promise<{userID: string, timezone: string}[]> => {
+    return new Promise<{userID: string, timezone: string}[]>(async (resolve, reject) => {
+        try {
+            const res = await db.collection('timezones').get();
+            if (res.empty) {
+                reject({code: 'EMPTY', error: 'No timezones configured'});
+            }
+            let timezones: {userID: string, timezone: string}[] = [];
+            res.forEach(doc => {
+                timezones.push({userID: doc.id, timezone: doc.data()['timezone']});
+            });
+            resolve(timezones);
+        } catch(exception) {
+            reject({code: 'UNKNOWN', error: exception});
+        }
+    });    
+}
+
 export const setEvent = (event: Event): Promise<void> => {
     return new Promise<void>(async (resolve, reject) => {
         try {
