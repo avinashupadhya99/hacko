@@ -54,7 +54,7 @@ client.on('ready', () => {
     });
     database.getGitNotifications().then(value => {
         if(value) {
-            startGitNotifications();
+            startGitNotifications(client);
         }
     })
 

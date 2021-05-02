@@ -72,7 +72,7 @@ export const startGitNotifications = (client: Client) => {
                     .setTimestamp();
         const reminderChannel = client.channels.cache.get(`${REMINDER_CHANNEL_ID}`);
         (<TextChannel> reminderChannel).send(embed);
-    }, 2 * 60 * 60 * 10000); // 2 hours
+    }, 2 * 60 * 60 * 1000); // 2 hours
 }
 
 export const stopGitNotifications = () => {
