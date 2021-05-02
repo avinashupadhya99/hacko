@@ -76,10 +76,15 @@ export const setEvent = (event: Event): Promise<void> => {
     })
 }
 
-export const getEvents = (): Promise<Events> => {
+export const getEvents = (options): Promise<Events> => {
     return new Promise<Events>(async (resolve, reject) => {
         try {
-            const res = await db.collection('events').get();
+            let res;
+            if(options && options.all) {
+                res = await db.collection('events').get();
+            } else {
+                res = await db.collection('events').where('time', '>=', new Date().getTime()).get();
+            }
             if (res.empty) {
                 reject({code: 'EMPTY', error: 'No events configured'});
             }

@@ -213,14 +213,24 @@ client.on('message', message => {
                 break;
 
                 case 'events':
-                    database.getEvents().then((events: IEvents) => {
+                    let title = 'Upcoming events';
+                    let options;
+                    if(args.length === 1) {
+                        if(args[0] === 'all') {
+                            options = {all: true};
+                            title = 'All Events';
+                        } else {
+                            return message.reply("Use `?events all` to view all events or `?events` to view all upcoming events");
+                        }
+                    } 
+                    database.getEvents(options).then((events: IEvents) => {
                         // TODO: Handle message length
                         let description = '';
                         events.forEach(event => {
                             description += `**Event name**: ${event.name}\n**Event time**: ${new Date(event.time).toUTCString()}\n**Event link**: ${event.link ? event.link : 'None'}\n\n`
                         })
                         const embed =new MessageEmbed()
-                            .setTitle('Events')
+                            .setTitle(title)
                             .setDescription(description)
                             .setColor('#FFA500')
                             .setTimestamp();
